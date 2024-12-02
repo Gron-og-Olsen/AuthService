@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "dgSpecHash": "bBaKYD6pxrqShiEDwh2nod3edbOPT0eJf1833gBrOx+6rNZtP6IT9lHAMaizEXKruy2HDZ/TGfxVu7sGiIdTOg==",
+  "success": true,
+  "projectFilePath": "/Users/Mel/4sem/GrønOgOlsen/AuthService/AuthServiceAPI/AuthServiceAPI.csproj",
+  "expectedPackageFiles": [
+    "/Users/Mel/.nuget/packages/microsoft.extensions.apidescription.server/6.0.5/microsoft.extensions.apidescription.server.6.0.5.nupkg.sha512",
+    "/Users/Mel/.nuget/packages/microsoft.openapi/1.2.3/microsoft.openapi.1.2.3.nupkg.sha512",
+    "/Users/Mel/.nuget/packages/swashbuckle.aspnetcore/6.4.0/swashbuckle.aspnetcore.6.4.0.nupkg.sha512",
+    "/Users/Mel/.nuget/packages/swashbuckle.aspnetcore.swagger/6.4.0/swashbuckle.aspnetcore.swagger.6.4.0.nupkg.sha512",
+    "/Users/Mel/.nuget/packages/swashbuckle.aspnetcore.swaggergen/6.4.0/swashbuckle.aspnetcore.swaggergen.6.4.0.nupkg.sha512",
+    "/Users/Mel/.nuget/packages/swashbuckle.aspnetcore.swaggerui/6.4.0/swashbuckle.aspnetcore.swaggerui.6.4.0.nupkg.sha512"
+  ],
+  "logs": []
+}
