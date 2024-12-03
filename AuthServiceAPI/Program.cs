@@ -1,15 +1,18 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHttpClient();
 builder.Services.AddControllers();
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
 // Læs de hemmelige værdier fra miljøvariabler
-string mySecret = Environment.GetEnvironmentVariable("Secret") ?? "defaultsecret";
-string myIssuer = Environment.GetEnvironmentVariable("Issuer") ?? "defaultissuer";
+string mySecret = Environment.GetEnvironmentVariable("Secret") ?? "none";
+string myIssuer = Environment.GetEnvironmentVariable("Issuer") ?? "none";
 
 // Tilføj JWT Bearer Authentication
 builder.Services
@@ -33,7 +36,6 @@ var app = builder.Build();
 // Brug af autentifikation og autorisation
 app.UseAuthentication(); // Denne linje aktiverer autentifikationen
 app.UseAuthorization();  // Denne linje aktiverer autorisationen
-
 app.MapControllers();
 
 app.Run();

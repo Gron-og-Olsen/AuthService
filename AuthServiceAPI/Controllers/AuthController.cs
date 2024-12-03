@@ -4,17 +4,17 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Identity;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Models;
-using VaultSharp;
-using VaultSharp.V1.AuthMethods.Token;
-using VaultSharp.V1.AuthMethods;
-using VaultSharp.V1.Commons;
-using System.Net.Http;
-using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json;
+using VaultSharp.V1.AuthMethods;
+using VaultSharp.V1.AuthMethods.Token;
+using VaultSharp;
+using VaultSharp.V1.Commons;
+using VaultSharp.Core;
 
 namespace AuthService.Controllers
 {
@@ -25,17 +25,21 @@ namespace AuthService.Controllers
         private readonly IConfiguration _config;
         private readonly ILogger<AuthController> _logger;
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IPasswordHasher<User> _passwordHasher;
         private string _issuer;
         private string _secret;
 
-        // Correct constructor to properly inject IHttpClientFactory
-        public AuthController(ILogger<AuthController> logger, IConfiguration config, IHttpClientFactory httpClientFactory)
+        public AuthController(
+            ILogger<AuthController> logger,
+            IConfiguration config,
+            IHttpClientFactory httpClientFactory,
+            IPasswordHasher<User> passwordHasher)
         {
             _config = config;
             _logger = logger;
-            _httpClientFactory = httpClientFactory; // Injected here correctly
+            _httpClientFactory = httpClientFactory;
+            _passwordHasher = passwordHasher;
         }
-
         // Method to generate the JWT token
         private async Task<string> GenerateJwtToken(string username)
         {
@@ -59,50 +63,84 @@ namespace AuthService.Controllers
         // Method to fetch user data from the external service
         private async Task<User?> GetUserData(LoginModel login)
         {
-            var endpointUrl = _config["UserServiceEndpoint"]! + "/" + login.Username;
+            var endpointUrl = _config["UserServiceEndpoint"]! + "/User/Username/" + login.Username;
             _logger.LogInformation("Retrieving user data from: {}", endpointUrl);
             var client = _httpClientFactory.CreateClient(); // Create HTTP client
             HttpResponseMessage response;
-            try {
+
+            try
+            {
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
                 response = await client.GetAsync(endpointUrl); // Fetch user data from the API
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 _logger.LogError(ex, ex.Message); // Log any errors
                 return null;
             }
+
+            // Log the status code to verify if the response is successful
+            _logger.LogInformation("Response status code: {StatusCode}", response.StatusCode);
+
             if (response.IsSuccessStatusCode)
             {
-                try {
+                try
+                {
                     string? userJson = await response.Content.ReadAsStringAsync();
-                    return JsonSerializer.Deserialize<User>(userJson); // Deserialize user object
-                } catch (Exception ex) {
+
+                    // Log the raw JSON to check the content
+                    _logger.LogInformation("Raw User JSON: {UserJson}", userJson);
+
+                    var user = JsonSerializer.Deserialize<User>(userJson); // Deserialize user object
+
+                    if (user != null)
+                    {
+                        // Log the deserialized user object to confirm all fields are present
+                        _logger.LogInformation("Deserialized User Object: {User}", JsonSerializer.Serialize(user));
+                    }
+
+                    return user; // Return deserialized user object
+                }
+                catch (Exception ex)
+                {
                     _logger.LogError(ex, ex.Message); // Log any errors
                     return null;
                 }
             }
+
+            // Log if the response wasn't successful
+            _logger.LogWarning("Failed to retrieve user data: {StatusCode}", response.StatusCode);
             return null; // Return null if no valid response
         }
+
 
         // POST method to handle login
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel login)
         {
             if (string.IsNullOrEmpty(login.Username) || string.IsNullOrEmpty(login.Password))
-                return BadRequest("Invalid login data");
+                return BadRequest(new { message = "Invalid login data" });
 
-            var user = await GetUserData(login); // Get user data from the service
+            var user = await GetUserData(login); // Get user data from the external UserService
 
-            if (user == null || user.Password != login.Password)
-                return Unauthorized("Invalid username or password");
+            if (user == null)
+                return Unauthorized(new { message = "Invalid username or password" });
 
-            var token = await GenerateJwtToken(user.Username); // Await the token generation
-            return Ok(new { Token = token }); // Return the generated JWT token
+            // Verify the entered password against the stored hashed password
+            var passwordVerificationResult = _passwordHasher.VerifyHashedPassword(user, user.Password, login.Password);
+
+            if (passwordVerificationResult != PasswordVerificationResult.Success)
+                return Unauthorized(new { message = "Invalid username or password" });
+
+            var token = await GenerateJwtToken(user.Username); // Generate JWT token
+            return Ok(new { Token = token }); // Return the token
         }
+
 
         // Method to get Vault secret values for issuer and secret
         private async Task GetVaultSecret()
         {
-            var EndPoint = "https://localhost:8201/";
+            var EndPoint = "https://localhost:8201/v1/secret/data/hemmeligheder"; // Ensure Vault's endpoint is correct
             var httpClientHandler = new HttpClientHandler();
             httpClientHandler.ServerCertificateCustomValidationCallback =
                 (message, cert, chain, sslPolicyErrors) => { return true; };
@@ -123,14 +161,38 @@ namespace AuthService.Controllers
             };
             IVaultClient vaultClient = new VaultClient(vaultClientSettings);
 
-            // Retrieve secrets from Vault
-            Secret<SecretData> kv2Secret = await vaultClient.V1.Secrets.KeyValue.V2
-                .ReadSecretAsync(path: "hemmeligheder", mountPoint: "secret");
-            _issuer = kv2Secret.Data.Data["Issuer"].ToString()!;
-            _secret = kv2Secret.Data.Data["Secret"].ToString()!;
+            // Log the endpoint being used
+            _logger.LogInformation("Connecting to Vault at: {Endpoint}", EndPoint);
 
-            _logger.LogInformation("issuer: {0}", _issuer);
-            _logger.LogInformation("secret: {0}", _secret);
+            try
+            {
+                // Attempt to read secret from Vault
+                _logger.LogInformation("Attempting to read secret at path: {Path}", "/v1/secret/data/hemmeligheder");
+                Secret<SecretData> kv2Secret = await vaultClient.V1.Secrets.KeyValue.V2
+                    .ReadSecretAsync(path: "hemmeligheder", mountPoint: "secret");
+
+                _issuer = kv2Secret.Data.Data["issuer"].ToString()!;
+                _secret = kv2Secret.Data.Data["secret"].ToString()!;
+
+                _logger.LogInformation("Successfully retrieved secrets from Vault.");
+                _logger.LogInformation("issuer: {issuer}", _issuer);
+                _logger.LogInformation("secret: {secret}", _secret); // Avoid logging sensitive information like the actual secret in production
+            }
+            catch (VaultApiException ex)
+            {
+                // Log more detailed information about the exception
+                _logger.LogError("Vault API exception occurred: {Message}", ex.Message);
+                _logger.LogError("Error details: {Errors}", ex.ApiErrors);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                // Log any other unexpected exceptions
+                _logger.LogError("An unexpected error occurred while fetching secrets from Vault: {Message}", ex.Message);
+                throw;
+            }
         }
+
+
     }
 }

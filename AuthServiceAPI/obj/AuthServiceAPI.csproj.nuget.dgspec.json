@@ -1,26 +1,27 @@
 {
   "format": 1,
   "restore": {
-    "/Users/Mel/4sem/GrønOgOlsen/AuthService/AuthServiceAPI/AuthServiceAPI.csproj": {}
+    "C:\\Users\\cbjoe\\OneDrive\\Desktop\\Sem4\\Grøn_Olsen\\Auth\\AuthService\\AuthServiceAPI\\AuthServiceAPI.csproj": {}
   },
   "projects": {
-    "/Users/Mel/4sem/GrønOgOlsen/AuthService/AuthServiceAPI/AuthServiceAPI.csproj": {
+    "C:\\Users\\cbjoe\\OneDrive\\Desktop\\Sem4\\Grøn_Olsen\\Auth\\AuthService\\AuthServiceAPI\\AuthServiceAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/Mel/4sem/GrønOgOlsen/AuthService/AuthServiceAPI/AuthServiceAPI.csproj",
+        "projectUniqueName": "C:\\Users\\cbjoe\\OneDrive\\Desktop\\Sem4\\Grøn_Olsen\\Auth\\AuthService\\AuthServiceAPI\\AuthServiceAPI.csproj",
         "projectName": "AuthServiceAPI",
-        "projectPath": "/Users/Mel/4sem/GrønOgOlsen/AuthService/AuthServiceAPI/AuthServiceAPI.csproj",
-        "packagesPath": "/Users/Mel/.nuget/packages/",
-        "outputPath": "/Users/Mel/4sem/GrønOgOlsen/AuthService/AuthServiceAPI/obj/",
+        "projectPath": "C:\\Users\\cbjoe\\OneDrive\\Desktop\\Sem4\\Grøn_Olsen\\Auth\\AuthService\\AuthServiceAPI\\AuthServiceAPI.csproj",
+        "packagesPath": "C:\\Users\\cbjoe\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\cbjoe\\OneDrive\\Desktop\\Sem4\\Grøn_Olsen\\Auth\\AuthService\\AuthServiceAPI\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/Users/Mel/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\cbjoe\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
-          "/usr/local/share/dotnet/library-packs": {},
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -44,9 +45,33 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[6.0.0, )"
+            },
+            "Microsoft.AspNetCore.OpenApi": {
+              "target": "Package",
+              "version": "[8.0.2, )"
+            },
+            "Microsoft.IdentityModel.Tokens": {
+              "target": "Package",
+              "version": "[8.2.1, )"
+            },
+            "MongoDB.Driver": {
+              "target": "Package",
+              "version": "[3.0.0, )"
+            },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[6.4.0, )"
+            },
+            "System.IdentityModel.Tokens.Jwt": {
+              "target": "Package",
+              "version": "[8.2.1, )"
+            },
+            "VaultSharp": {
+              "target": "Package",
+              "version": "[1.17.5.1, )"
             }
           },
           "imports": [
@@ -68,7 +93,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.201/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.201/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
