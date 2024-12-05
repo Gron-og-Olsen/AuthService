@@ -168,14 +168,14 @@ namespace AuthService.Controllers
                 _issuer, // Uses the issuer value retrieved from Vault
                 "http://localhost", // This can be changed to your actual domain or API URL
                 claims,
-                expires: DateTime.Now.AddMinutes(15),
+                expires: DateTime.Now.AddHours(2),
                 signingCredentials: credentials
             );
             return new JwtSecurityTokenHandler().WriteToken(token); // Generate and return token
         }
         
 
-        /*
+    
         [HttpGet("GetValidationKeys")]
         public async Task<IActionResult> GetValidationKeys()
         {
@@ -186,7 +186,7 @@ namespace AuthService.Controllers
                 Secret = _secret
             });
         }
-        */
+        
 
     }
 }
