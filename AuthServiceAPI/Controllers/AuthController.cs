@@ -113,7 +113,7 @@ namespace AuthService.Controllers
             if (passwordVerificationResult != PasswordVerificationResult.Success)
                 return Unauthorized(new { message = "Invalid username or password" });
 
-            var token = await GenerateJwtToken(user.Username); // Generate JWT token
+            var token = await GenerateJwtToken(user.Username,user.Role); // Generate JWT token
             return Ok(new { Token = token }); // Return the token
         }
         
@@ -154,14 +154,15 @@ namespace AuthService.Controllers
 
         
         // Method to generate the JWT token
-        private async Task<string> GenerateJwtToken(string username)
+        private async Task<string> GenerateJwtToken(string username,string role)
         {
             await GetVaultSecret(); // Ensure secrets are retrieved from Vault
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secret));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             var claims = new[]
             {
-                new Claim(ClaimTypes.NameIdentifier, username)
+                new Claim(ClaimTypes.NameIdentifier, username),
+                new Claim(ClaimTypes.Role, role)
             };
             var token = new JwtSecurityToken(
                 _issuer, // Uses the issuer value retrieved from Vault

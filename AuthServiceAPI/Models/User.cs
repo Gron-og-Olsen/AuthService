@@ -18,8 +18,8 @@ public class User
     [JsonPropertyName("password")]
     public string Password { get; set; }
 
-    [JsonPropertyName("address1")]
-    public string Address1 { get; set; }
+    [JsonPropertyName("address")]
+    public string Address { get; set; }
 
     [JsonPropertyName("city")]
     public string City { get; set; }
@@ -27,10 +27,10 @@ public class User
     [JsonPropertyName("postalCode")]
     public int PostalCode { get; set; }
 
-    [JsonPropertyName("contactName")]
-    public string ContactName { get; set; }
+    [JsonPropertyName("role")]
+    public string Role { get; set; }
 
-    [JsonPropertyName("taxNumber")]
-    public string TaxNumber { get; set; }
+    [JsonPropertyName("tlf")]
+    public string TLF { get; set; }
 }
 
