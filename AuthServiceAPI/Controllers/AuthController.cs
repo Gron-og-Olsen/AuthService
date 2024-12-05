@@ -175,5 +175,18 @@ namespace AuthService.Controllers
         }
         
 
+        /*
+        [HttpGet("GetValidationKeys")]
+        public async Task<IActionResult> GetValidationKeys()
+        {
+        await GetVaultSecret(); // Sørg for at hente hemmeligheder fra Vault, hvis de ikke allerede er hentet
+        return Ok(new
+            {
+                Issuer = _issuer,
+                Secret = _secret
+            });
+        }
+        */
+
     }
 }
