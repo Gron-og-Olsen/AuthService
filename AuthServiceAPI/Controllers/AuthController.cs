@@ -40,153 +40,161 @@ namespace AuthService.Controllers
             _httpClientFactory = httpClientFactory;
             _passwordHasher = passwordHasher;
         }
-        
-        // Method to fetch user data from the external service
+
         private async Task<User?> GetUserData(LoginModel login)
         {
+            _logger.LogInformation("Entering GetUserData method.");
             var endpointUrl = _config["UserServiceEndpoint"]! + "/User/Username/" + login.Username;
-            _logger.LogInformation("Retrieving user data from: {}", endpointUrl);
-            var client = _httpClientFactory.CreateClient(); // Create HTTP client
+            _logger.LogInformation("Constructed endpoint URL: {EndpointUrl}", endpointUrl);
+
+            var client = _httpClientFactory.CreateClient();
             HttpResponseMessage response;
 
             try
             {
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
-                response = await client.GetAsync(endpointUrl); // Fetch user data from the API
+                _logger.LogInformation("Sending request to UserService...");
+                response = await client.GetAsync(endpointUrl);
+                _logger.LogInformation("Received response with status code: {StatusCode}", response.StatusCode);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, ex.Message); // Log any errors
+                _logger.LogError(ex, "Error during HTTP request to UserService.");
                 return null;
             }
-
-            // Log the status code to verify if the response is successful
-            _logger.LogInformation("Response status code: {StatusCode}", response.StatusCode);
 
             if (response.IsSuccessStatusCode)
             {
                 try
                 {
                     string? userJson = await response.Content.ReadAsStringAsync();
+                    _logger.LogInformation("User JSON received: {UserJson}", userJson);
 
-                    // Log the raw JSON to check the content
-                    _logger.LogInformation("Raw User JSON: {UserJson}", userJson);
-
-                    var user = JsonSerializer.Deserialize<User>(userJson); // Deserialize user object
-
-                    if (user != null)
-                    {
-                        // Log the deserialized user object to confirm all fields are present
-                        _logger.LogInformation("Deserialized User Object: {User}", JsonSerializer.Serialize(user));
-                    }
-
-                    return user; // Return deserialized user object
+                    var user = JsonSerializer.Deserialize<User>(userJson);
+                    _logger.LogInformation("Deserialized user object: {User}", JsonSerializer.Serialize(user));
+                    return user;
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, ex.Message); // Log any errors
+                    _logger.LogError(ex, "Error deserializing user data.");
                     return null;
                 }
             }
 
-            // Log if the response wasn't successful
-            _logger.LogWarning("Failed to retrieve user data: {StatusCode}", response.StatusCode);
-            return null; // Return null if no valid response
+            _logger.LogWarning("Unsuccessful response from UserService: {StatusCode}", response.StatusCode);
+            return null;
         }
 
-
-        // POST method to handle login
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel login)
         {
-            if (string.IsNullOrEmpty(login.Username) || string.IsNullOrEmpty(login.Password))
-                return BadRequest(new { message = "Invalid login data" });
+            _logger.LogInformation("Login attempt for user: {Username}", login.Username);
 
-            var user = await GetUserData(login); // Get user data from the external UserService
+            if (string.IsNullOrEmpty(login.Username) || string.IsNullOrEmpty(login.Password))
+            {
+                _logger.LogWarning("Invalid login data provided.");
+                return BadRequest(new { message = "Invalid login data" });
+            }
+
+            var user = await GetUserData(login);
 
             if (user == null)
-                return Unauthorized(new { message = "Invalid username or password" });
+            {
+                _logger.LogWarning("No user found with username: {Username}", login.Username);
+                return Unauthorized(new { message = "Invalid username" });
+            }
 
-            // Verify the entered password against the stored hashed password
             var passwordVerificationResult = _passwordHasher.VerifyHashedPassword(user, user.Password, login.Password);
 
             if (passwordVerificationResult != PasswordVerificationResult.Success)
-                return Unauthorized(new { message = "Invalid username or password" });
+            {
+                _logger.LogWarning("Password verification failed for username: {Username}", login.Username);
+                return Unauthorized(new { message = "Invalid password" });
+            }
 
-            var token = await GenerateJwtToken(user.Username,user.Role); // Generate JWT token
-            return Ok(new { Token = token }); // Return the token
+            _logger.LogInformation("Generating JWT token for username: {Username}", login.Username);
+            var token = await GenerateJwtToken(user.Username, user.Role);
+
+            _logger.LogInformation("Login successful for username: {Username}", login.Username);
+            return Ok(new { Token = token });
         }
-        
 
-        // Method to get Vault secret values for issuer and secret
         private async Task GetVaultSecret()
         {
-            var EndPoint = "https://localhost:8201/";
+            _logger.LogInformation("Fetching secrets from Vault...");
+            var EndPoint = "https://vault_dev:8201/";
             var httpClientHandler = new HttpClientHandler();
             httpClientHandler.ServerCertificateCustomValidationCallback =
-            (message, cert, chain, sslPolicyErrors) => { return true; };
+                (message, cert, chain, sslPolicyErrors) => true;
 
-            // Initialize one of the several auth methods.
-            IAuthMethodInfo authMethod =
-            new TokenAuthMethodInfo("00000000-0000-0000-0000-000000000000");
-            // Initialize settings. You can also set proxies, custom delegates etc. here.
+            IAuthMethodInfo authMethod = new TokenAuthMethodInfo("00000000-0000-0000-0000-000000000000");
             var vaultClientSettings = new VaultClientSettings(EndPoint, authMethod)
             {
                 Namespace = "",
                 MyHttpClientProviderFunc = handler
-                => new HttpClient(httpClientHandler)
-                {
-                    BaseAddress = new Uri(EndPoint)
-                }
+                    => new HttpClient(httpClientHandler) { BaseAddress = new Uri(EndPoint) }
             };
+
             IVaultClient vaultClient = new VaultClient(vaultClientSettings);
 
-            // Use client to read a key-value secret.
-            Secret<SecretData> kv2Secret = await vaultClient.V1.Secrets.KeyValue.V2
-            .ReadSecretAsync(path: "hemmeligheder", mountPoint: "secret");
-            _issuer = kv2Secret.Data.Data["Issuer"].ToString()!;
+            try
+            {
+                _logger.LogInformation("Reading secrets from Vault path: secret/hemmeligheder");
+                Secret<SecretData> kv2Secret = await vaultClient.V1.Secrets.KeyValue.V2.ReadSecretAsync(
+                    path: "hemmeligheder",
+                    mountPoint: "secret"
+                );
 
-            // Use client to read a key-value secret.
-            _secret = kv2Secret.Data.Data["Secret"].ToString()!;
-            _logger.LogInformation("issue: {0}", _issuer);
-            _logger.LogInformation("secret: {0}", _secret);
+                _issuer = kv2Secret.Data.Data["Issuer"].ToString();
+                _secret = kv2Secret.Data.Data["Secret"].ToString();
+
+                _logger.LogInformation("Vault secrets retrieved: Issuer={Issuer}, Secret=******", _issuer);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving secrets from Vault.");
+                throw;
+            }
         }
 
-        
-        // Method to generate the JWT token
-        private async Task<string> GenerateJwtToken(string username,string role)
+        private async Task<string> GenerateJwtToken(string username, string role)
         {
-            await GetVaultSecret(); // Ensure secrets are retrieved from Vault
+            _logger.LogInformation("Generating JWT token...");
+            await GetVaultSecret();
+
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secret));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, username),
                 new Claim(ClaimTypes.Role, role)
             };
+
             var token = new JwtSecurityToken(
-                _issuer, // Uses the issuer value retrieved from Vault
-                "http://localhost", // This can be changed to your actual domain or API URL
+                _issuer,
+                "http://authservice",
                 claims,
                 expires: DateTime.Now.AddHours(2),
                 signingCredentials: credentials
             );
-            return new JwtSecurityTokenHandler().WriteToken(token); // Generate and return token
-        }
-        
 
-    
+            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+            _logger.LogInformation("JWT token generated successfully.");
+            return jwt;
+        }
+
         [HttpGet("GetValidationKeys")]
         public async Task<IActionResult> GetValidationKeys()
         {
-        await GetVaultSecret(); // Sørg for at hente hemmeligheder fra Vault, hvis de ikke allerede er hentet
-        return Ok(new
+            _logger.LogInformation("Fetching validation keys...");
+            await GetVaultSecret();
+            return Ok(new
             {
                 Issuer = _issuer,
                 Secret = _secret
             });
         }
-        
-
     }
 }
+

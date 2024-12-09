@@ -26,7 +26,7 @@ builder.Services
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
             ValidIssuer = myIssuer,
-            ValidAudience = "http://localhost", // Du kan ændre dette til den ønskede værdi
+            ValidAudience = "http://authservice", // Du kan ændre dette til den ønskede værdi
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(mySecret))
         };
     });
