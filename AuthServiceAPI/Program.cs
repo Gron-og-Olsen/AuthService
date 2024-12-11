@@ -1,10 +1,10 @@
-using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Models;
 using NLog;
 using NLog.Web;
+using System.Text;
 
 var logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings()
     .GetCurrentClassLogger();
@@ -14,7 +14,11 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
 
-    builder.Services.AddHttpClient();
+    // Set up NLog
+    builder.Logging.ClearProviders();
+    builder.Host.UseNLog();
+
+    // Add services to the container.
     builder.Services.AddControllers();
     builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
@@ -37,9 +41,6 @@ try
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(mySecret))
             };
         });
-
-    builder.Logging.ClearProviders();
-    builder.Host.UseNLog();
 
     var app = builder.Build();
 

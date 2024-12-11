@@ -407,6 +407,18 @@
           }
         }
       },
+      "NLog.Targets.Loki/2.2.0": {
+        "type": "package",
+        "dependencies": {
+          "NLog": "5.2.8"
+        },
+        "compile": {
+          "lib/net8.0/NLog.Loki.dll": {}
+        },
+        "runtime": {
+          "lib/net8.0/NLog.Loki.dll": {}
+        }
+      },
       "NLog.Web.AspNetCore/5.3.15": {
         "type": "package",
         "dependencies": {
@@ -1490,6 +1502,23 @@
         "nlog.extensions.logging.nuspec"
       ]
     },
+    "NLog.Targets.Loki/2.2.0": {
+      "sha512": "GpVrKS+xFf42G6gvXwAy4pQuPVZYQhGuGqev0B7TK0WO1ttmKzgKUHt7JxxWrbA7rP93aou5PX3hSZB4TFC5hg==",
+      "type": "package",
+      "path": "nlog.targets.loki/2.2.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE",
+        "README.md",
+        "lib/net6.0/NLog.Loki.dll",
+        "lib/net7.0/NLog.Loki.dll",
+        "lib/net8.0/NLog.Loki.dll",
+        "lib/netstandard2.0/NLog.Loki.dll",
+        "nlog.targets.loki.2.2.0.nupkg.sha512",
+        "nlog.targets.loki.nuspec"
+      ]
+    },
     "NLog.Web.AspNetCore/5.3.15": {
       "sha512": "Am5ZJ1htYf6K3QJ7stIbKK3CTGw1BOyGtucWxHoDScM/U1w6nE/zmYfZTfj7jRIKuZwbwpBqtRGZJsUcMGUvfA==",
       "type": "package",
@@ -1905,6 +1934,7 @@
       "Microsoft.IdentityModel.Tokens >= 8.2.1",
       "MongoDB.Driver >= 3.0.0",
       "NLog >= 5.3.4",
+      "NLog.Targets.Loki >= 2.2.0",
       "Nlog.Web.AspNetCore >= 5.3.15",
       "Swashbuckle.AspNetCore >= 6.4.0",
       "System.IdentityModel.Tokens.Jwt >= 8.2.1",
@@ -1980,6 +2010,10 @@
           "NLog": {
             "target": "Package",
             "version": "[5.3.4, )"
+          },
+          "NLog.Targets.Loki": {
+            "target": "Package",
+            "version": "[2.2.0, )"
           },
           "Nlog.Web.AspNetCore": {
             "target": "Package",

@@ -70,6 +70,10 @@
               "target": "Package",
               "version": "[5.3.4, )"
             },
+            "NLog.Targets.Loki": {
+              "target": "Package",
+              "version": "[2.2.0, )"
+            },
             "Nlog.Web.AspNetCore": {
               "target": "Package",
               "version": "[5.3.15, )"
