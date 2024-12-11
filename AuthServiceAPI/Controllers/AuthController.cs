@@ -172,12 +172,13 @@ namespace AuthService.Controllers
             };
 
             var token = new JwtSecurityToken(
-                _issuer,
-                "http://authservice",
-                claims,
-                expires: DateTime.Now.AddHours(2),
-                signingCredentials: credentials
-            );
+            issuer: _issuer,         // Udgiveren af tokenet
+            audience: null,          // Fjernet ved at sætte den til null
+            claims: claims,          // Tokenets indhold
+            expires: DateTime.Now.AddHours(2), // Udløbstid
+            signingCredentials: credentials    // Signeringsoplysninger
+);
+
 
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
             _logger.LogInformation("JWT token generated successfully.");
