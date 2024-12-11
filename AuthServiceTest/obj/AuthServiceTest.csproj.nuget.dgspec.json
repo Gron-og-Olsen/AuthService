@@ -1,20 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\cbjoe\\OneDrive\\Desktop\\Sem4\\Grøn_Olsen\\Auth\\AuthService\\AuthServiceTest\\AuthServiceTest.csproj": {}
+    "C:\\Users\\Charm\\Documents\\GrønogOlsen\\AuthService\\AuthService\\AuthServiceTest\\AuthServiceTest.csproj": {}
   },
   "projects": {
-    "C:\\Users\\cbjoe\\OneDrive\\Desktop\\Sem4\\Grøn_Olsen\\Auth\\AuthService\\AuthServiceAPI\\AuthServiceAPI.csproj": {
+    "C:\\Users\\Charm\\Documents\\GrønogOlsen\\AuthService\\AuthService\\AuthServiceAPI\\AuthServiceAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\cbjoe\\OneDrive\\Desktop\\Sem4\\Grøn_Olsen\\Auth\\AuthService\\AuthServiceAPI\\AuthServiceAPI.csproj",
+        "projectUniqueName": "C:\\Users\\Charm\\Documents\\GrønogOlsen\\AuthService\\AuthService\\AuthServiceAPI\\AuthServiceAPI.csproj",
         "projectName": "AuthServiceAPI",
-        "projectPath": "C:\\Users\\cbjoe\\OneDrive\\Desktop\\Sem4\\Grøn_Olsen\\Auth\\AuthService\\AuthServiceAPI\\AuthServiceAPI.csproj",
-        "packagesPath": "C:\\Users\\cbjoe\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\cbjoe\\OneDrive\\Desktop\\Sem4\\Grøn_Olsen\\Auth\\AuthService\\AuthServiceAPI\\obj\\",
+        "projectPath": "C:\\Users\\Charm\\Documents\\GrønogOlsen\\AuthService\\AuthService\\AuthServiceAPI\\AuthServiceAPI.csproj",
+        "packagesPath": "C:\\Users\\Charm\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Charm\\Documents\\GrønogOlsen\\AuthService\\AuthService\\AuthServiceAPI\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\cbjoe\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Charm\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -22,6 +26,7 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -61,6 +66,18 @@
               "target": "Package",
               "version": "[3.0.0, )"
             },
+            "NLog": {
+              "target": "Package",
+              "version": "[5.3.4, )"
+            },
+            "NLog.Targets.Loki": {
+              "target": "Package",
+              "version": "[2.2.0, )"
+            },
+            "Nlog.Web.AspNetCore": {
+              "target": "Package",
+              "version": "[5.3.15, )"
+            },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[6.4.0, )"
@@ -93,21 +110,25 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.201/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.404/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\cbjoe\\OneDrive\\Desktop\\Sem4\\Grøn_Olsen\\Auth\\AuthService\\AuthServiceTest\\AuthServiceTest.csproj": {
+    "C:\\Users\\Charm\\Documents\\GrønogOlsen\\AuthService\\AuthService\\AuthServiceTest\\AuthServiceTest.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\cbjoe\\OneDrive\\Desktop\\Sem4\\Grøn_Olsen\\Auth\\AuthService\\AuthServiceTest\\AuthServiceTest.csproj",
+        "projectUniqueName": "C:\\Users\\Charm\\Documents\\GrønogOlsen\\AuthService\\AuthService\\AuthServiceTest\\AuthServiceTest.csproj",
         "projectName": "AuthServiceTest",
-        "projectPath": "C:\\Users\\cbjoe\\OneDrive\\Desktop\\Sem4\\Grøn_Olsen\\Auth\\AuthService\\AuthServiceTest\\AuthServiceTest.csproj",
-        "packagesPath": "C:\\Users\\cbjoe\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\cbjoe\\OneDrive\\Desktop\\Sem4\\Grøn_Olsen\\Auth\\AuthService\\AuthServiceTest\\obj\\",
+        "projectPath": "C:\\Users\\Charm\\Documents\\GrønogOlsen\\AuthService\\AuthService\\AuthServiceTest\\AuthServiceTest.csproj",
+        "packagesPath": "C:\\Users\\Charm\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Charm\\Documents\\GrønogOlsen\\AuthService\\AuthService\\AuthServiceTest\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\cbjoe\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Charm\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -115,14 +136,15 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\cbjoe\\OneDrive\\Desktop\\Sem4\\Grøn_Olsen\\Auth\\AuthService\\AuthServiceAPI\\AuthServiceAPI.csproj": {
-                "projectPath": "C:\\Users\\cbjoe\\OneDrive\\Desktop\\Sem4\\Grøn_Olsen\\Auth\\AuthService\\AuthServiceAPI\\AuthServiceAPI.csproj"
+              "C:\\Users\\Charm\\Documents\\GrønogOlsen\\AuthService\\AuthService\\AuthServiceAPI\\AuthServiceAPI.csproj": {
+                "projectPath": "C:\\Users\\Charm\\Documents\\GrønogOlsen\\AuthService\\AuthService\\AuthServiceAPI\\AuthServiceAPI.csproj"
               }
             }
           }
@@ -179,7 +201,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.201/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.404/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
