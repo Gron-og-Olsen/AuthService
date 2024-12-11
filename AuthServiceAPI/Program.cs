@@ -3,38 +3,59 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Models;
+using NLog;
+using NLog.Web;
 
-var builder = WebApplication.CreateBuilder(args);
+var logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings()
+    .GetCurrentClassLogger();
+logger.Debug("init main");
 
-builder.Services.AddHttpClient();
-builder.Services.AddControllers();
-builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+try
+{
+    var builder = WebApplication.CreateBuilder(args);
 
-// Læs de hemmelige værdier fra miljøvariabler
-string mySecret = Environment.GetEnvironmentVariable("Secret") ?? "none";
-string myIssuer = Environment.GetEnvironmentVariable("Issuer") ?? "none";
+    builder.Services.AddHttpClient();
+    builder.Services.AddControllers();
+    builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
-// Tilføj JWT Bearer Authentication
-builder.Services
-    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
+    // Læs de hemmelige værdier fra miljøvariabler
+    string mySecret = Environment.GetEnvironmentVariable("Secret") ?? "none";
+    string myIssuer = Environment.GetEnvironmentVariable("Issuer") ?? "none";
+
+    // Tilføj JWT Bearer Authentication
+    builder.Services
+        .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddJwtBearer(options =>
         {
-            ValidateIssuer = true,
-            ValidateAudience = false,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = myIssuer,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(mySecret))
-        };
-    });
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = false,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = myIssuer,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(mySecret))
+            };
+        });
 
-var app = builder.Build();
+    builder.Logging.ClearProviders();
+    builder.Host.UseNLog();
 
-// Brug af autentifikation og autorisation
-app.UseAuthentication(); // Denne linje aktiverer autentifikationen
-app.UseAuthorization();  // Denne linje aktiverer autorisationen
-app.MapControllers();
+    var app = builder.Build();
 
-app.Run();
+    // Brug af autentifikation og autorisation
+    app.UseAuthentication(); // Denne linje aktiverer autentifikationen
+    app.UseAuthorization();  // Denne linje aktiverer autorisationen
+    app.MapControllers();
+
+    app.Run();
+}
+catch (Exception ex)
+{
+    logger.Error(ex, "Stopped program because of exception");
+    throw;
+}
+finally
+{
+    NLog.LogManager.Shutdown();
+}

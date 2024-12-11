@@ -24,6 +24,8 @@ namespace AuthService.Controllers
     {
         private readonly IConfiguration _config;
         private readonly ILogger<AuthController> _logger;
+
+
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IPasswordHasher<User> _passwordHasher;
         private string? _issuer;
@@ -39,6 +41,12 @@ namespace AuthService.Controllers
             _logger = logger;
             _httpClientFactory = httpClientFactory;
             _passwordHasher = passwordHasher;
+
+                // Tilføj log-information om serverens IP-adresse
+            var hostName = System.Net.Dns.GetHostName();
+            var ips = System.Net.Dns.GetHostAddresses(hostName);
+            var _ipaddr = ips.First().MapToIPv4().ToString();
+            _logger.LogInformation(1, $"Auth Service responding from {_ipaddr}");
         }
 
         private async Task<User?> GetUserData(LoginModel login)
