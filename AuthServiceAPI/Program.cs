@@ -22,6 +22,9 @@ try
     builder.Services.AddControllers();
     builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
+    // Registrer HttpClientFactory
+    builder.Services.AddHttpClient();
+
     // Læs de hemmelige værdier fra miljøvariabler
     string mySecret = Environment.GetEnvironmentVariable("Secret") ?? "none";
     string myIssuer = Environment.GetEnvironmentVariable("Issuer") ?? "none";

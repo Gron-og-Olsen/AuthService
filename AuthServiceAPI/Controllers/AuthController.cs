@@ -124,17 +124,21 @@ namespace AuthService.Controllers
         private async Task GetVaultSecret()
         {
             _logger.LogInformation("Fetching secrets from Vault...");
-            var EndPoint = "https://vault_dev:8201/";
+            var vaultEndpoint = _config["VAULT_ENDPOINT"]; // Fetch the environment variable
+            if (string.IsNullOrEmpty(vaultEndpoint))
+            {
+                throw new InvalidOperationException("Vault endpoint is not configured.");
+            }
             var httpClientHandler = new HttpClientHandler();
             httpClientHandler.ServerCertificateCustomValidationCallback =
                 (message, cert, chain, sslPolicyErrors) => true;
 
             IAuthMethodInfo authMethod = new TokenAuthMethodInfo("00000000-0000-0000-0000-000000000000");
-            var vaultClientSettings = new VaultClientSettings(EndPoint, authMethod)
+            var vaultClientSettings = new VaultClientSettings(vaultEndpoint, authMethod)
             {
                 Namespace = "",
                 MyHttpClientProviderFunc = handler
-                    => new HttpClient(httpClientHandler) { BaseAddress = new Uri(EndPoint) }
+                    => new HttpClient(httpClientHandler) { BaseAddress = new Uri(vaultEndpoint) }
             };
 
             IVaultClient vaultClient = new VaultClient(vaultClientSettings);
